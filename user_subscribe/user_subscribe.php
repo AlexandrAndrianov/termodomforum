@@ -271,6 +271,55 @@ if ($arUser['PERSONAL_PHOTO']) {
 </form>			
 			
 		</div>
+		<script type="text/javascript">
+	
+		
+		$('.control-box-checkbox').bind('change',
+				function(e){
+					var li = e.target.parentNode.parentNode;
+					if($(li).attr("class") === 'checked' )
+					{
+						$(li).attr("class", ' ');
+					}
+					else $(li).attr("class", 'checked');
+				});
+	
+	function selall(){
+		var check = $('input[type=checkbox]');
+		var count = check.length
+		for(var i =0; i < count; i++)
+		{
+			if(check[i].checked)
+			{
+				$(check[i]).removeAttr('checked');
+				$(check[i]).change();
+			}
+			else
+			{
+				$(check[i]).attr('checked', 'checked');
+				$(check[i]).change();
+			}
+		}
+	}
+	
+	</script>
+	
+	<? 
+		if(!strcmp($_GET['select'] ,'tru'))
+		{
+			$len = count($_GET['substr']);
+			if($len)
+			{
+				for(; $len >=0; $len -= 1)
+				{
+					CForumSubscribe::Delete($_GET['substr'][$len]);
+				}
+			}
+			
+			header("Location:".$pathForum."user/".$idUSER."/post/all/");
+			
+		}
+	?>
 							<!----------END_Andrianov A.M. 4.08.2014----------------->
 							
                     </div><!-- /block-->
