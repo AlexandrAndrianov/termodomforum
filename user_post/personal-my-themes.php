@@ -173,15 +173,22 @@ if ($arUser['PERSONAL_PHOTO']) {
 																	<em class="forum-cat-prelink">
 																	
 																	<?$arForum = CForumNew::GetByID($res['FORUM_ID']);
-
 																		$arGroup = CForumGroup::GetByIDEx($arForum['FORUM_GROUP_ID']);
-					
+																		
+																		/***UrlPath************************/
+																		$pathForum = "/communication/forum/";
+																		$pathTopic =  "forum#FID#/";
+																		
+																		$arTopicUrl = array('FID' => $arForum['ID']);
+																		$pageTopic = CComponentEngine::MakePathFromTemplate($pathTopic, $arTopicUrl);
+																		
+																		/*****EndUrlPatch******************/
 																	?>
 																	<?if($arGroup):?>
-																		<a href=""><?=$arGroup['NAME']?></a>
+																		<a href="<?=$pathForum.'group'.$arGroup['ID']?>"><?=$arGroup['NAME']?></a>
 																		>	
 																	<?endif?>	
-																		<a href=""><?=$arForum['NAME']?></a>
+																		<a href="<?=$pathForum.$pageTopic?>"><?=$arForum['NAME']?></a>
 																	</em>
 																	<h4>
 																		<?if (intval($res["SORT"]) != 150 && $res["STATE"]!="Y"):
@@ -214,7 +221,7 @@ if ($arUser['PERSONAL_PHOTO']) {
 																	if (false && strLen($res["IMAGE"]) > 0):
 																			?><img src="<?=$arParams["PATH_TO_ICON"].$res["IMAGE"];?>" alt="<?=$res["IMAGE_DESCR"];?>" border="0" width="15" height="15"/><?
 																	endif;
-																			?><a href="<?=$res["URL"]["TOPIC"]?>" title="Тема начата <?=$res["START_DATE"]?>"><?=$res["TITLE"]?></a><?
+																			?><a href="<?=$pathForum.$pageTopic.$arTopic['TITLE_SEO']?>" title="Тема начата <?=$res["START_DATE"]?>"><?=$res["TITLE"]?></a><?
 																	if ($res["TopicStatus"] == "NEW" && strLen($arParams["~TMPLT_SHOW_ADDITIONAL_MARKER"]) > 0):
 																			?><noindex><a href="<?=$res["URL"]["MESSAGE_UNREAD"]?>" rel="nofollow" class="forum-new-message-marker"><?=$arParams["~TMPLT_SHOW_ADDITIONAL_MARKER"]?></a></noindex><?
 																	endif;

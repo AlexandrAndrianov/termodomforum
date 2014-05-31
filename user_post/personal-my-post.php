@@ -109,13 +109,29 @@ if ($arUser['PERSONAL_PHOTO']) {
 									<?$arTopic = CForumTopic::GetByID($value['id']);
 										$arForum = CForumNew::GetByID($arTopic['FORUM_ID']);
 										$arGroup = CForumGroup::GetByIDEx($arForum['FORUM_GROUP_ID']);
+									
+										/***UrlPath************************/
+										$pathForum = "/communication/forum/";
+										$pathTopic =  "forum#FID#/";
+										$pathMess = "messages/forum#FID#/message#MID#/#TITLE_SEO#";
+										
+										$arTopicUrl = array('FID' => $arForum['ID']);
+										$arMessUrl = array('FID' => $arForum['ID'], 'MID' => $value['idmess'],
+															'TITLE_SEO' => $arTopic['TITLE_SEO']);
+					
+										$pageTopic = CComponentEngine::MakePathFromTemplate($pathTopic, $arTopicUrl);
+										$pageMess = CComponentEngine::MakePathFromTemplate($pathMess, $arMessUrl);
+										
+										
+			
+										/*****EndUrlPatch******************/
 									?>
 									<em class="forum-cat-prelink">
 										<?if($arGroup):?>
-											<a href=""><?=$arGroup['NAME']?></a>
+											<a href="<?=$pathForum.'group'.$arGroup['ID']?>"><?=$arGroup['NAME']?></a>
 											>	
 										<?endif?>	
-											<a href=""><?=$arForum['NAME']?></a>
+											<a href="<?=$pathForum.$pageTopic?>"><?=$arForum['NAME']?></a>
 									</em>
 									<h4>
 										<?
@@ -159,7 +175,7 @@ if ($arUser['PERSONAL_PHOTO']) {
 										if (false && strLen($arTopic["IMAGE"]) > 0):
 												?><img src="<?=$arParams["PATH_TO_ICON"].$arTopic["IMAGE"];?>" alt="<?=$arTopic["IMAGE_DESCR"];?>" border="0" width="15" height="15"/><?
 										endif;
-												?><a href="<?=$arTopic["URL"]["TOPIC"]?>" title="Тема начата <?=$arTopic["START_DATE"]?>"><?=$arTopic["TITLE"]?></a><?
+												?><a href="<?=$pathForum.$pageTopic.$arTopic['TITLE_SEO']?>" title="Тема начата <?=$arTopic["START_DATE"]?>"><?=$arTopic["TITLE"]?></a><?
 										if ($arTopic["TopicStatus"] == "NEW" && strLen($arParams["~TMPLT_SHOW_ADDITIONAL_MARKER"]) > 0):
 												?><noindex><a href="<?=$arTopic["URL"]["MESSAGE_UNREAD"]?>" rel="nofollow" class="forum-new-message-marker"><?=$arParams["~TMPLT_SHOW_ADDITIONAL_MARKER"]?></a></noindex><?
 										endif;
@@ -187,7 +203,7 @@ if ($arUser['PERSONAL_PHOTO']) {
 										<a title="Ссылка на это сообщение" 
 										onclick="prompt(this.title + ' [' + this.innerHTML + ']',
 														(location.protocol + '//' + location.host + this.getAttribute('href')));
-														return false;"href="/Да буде тута ссылка">#<?=$value['idmess']?></a>
+														return false;"href="<?=$pathForum.$pageMess.'#message'.$value['idmess']?>">#<?=$value['idmess']?></a>
 									</i>
 									<span class="post-date"><?=EditData($value['date'])?></span>
 								</div>
