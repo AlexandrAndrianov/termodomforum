@@ -1,28 +1,58 @@
-<? /*define("NEED_AUTH", true);*/?><?
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-$APPLICATION->SetTitle("Профиль");
-?>
-<?
-    global $USER;
-    $idUSER = (isset($_GET["id"]))?intval($_GET["id"]):$USER->GetId();
-    $idCurUSER=$USER->GetID();
-    
-    $isIm = ($idUSER==$idCurUSER);
-    
-    $rsUser = CUser::GetByID($idUSER);
-    if (!$arUser = $rsUser->Fetch()) {
-        LocalRedirect("/404.php");
-    } elseif ($arUser['ACTIVE']=="N") {
-        LocalRedirect("/404.php");
-    }
-//**************Andrianov A.M. 16.07.2014******************************
-	$arAutoriz ="";
+<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
+?><?/*$APPLICATION->IncludeComponent(
+	"bitrix:forum.user.post",
+	"",
+	array(
+		"UID" =>  $arResult["UID"],
+		"mode" =>  $arResult["mode"],
+		
+		"URL_TEMPLATES_LIST" =>  $arResult["URL_TEMPLATES_LIST"],
+		"URL_TEMPLATES_READ" => $arResult["URL_TEMPLATES_READ"],
+		"URL_TEMPLATES_MESSAGE" => $arResult["URL_TEMPLATES_MESSAGE"],
+		"URL_TEMPLATES_USER_LIST" =>  $arResult["URL_TEMPLATES_USER_LIST"],
+		"URL_TEMPLATES_PROFILE_VIEW" => ($arParams["SEO_USER"] == "TEXT" ? "" : $arResult["URL_TEMPLATES_PROFILE_VIEW"]),
+		"URL_TEMPLATES_USER_POST" =>  $arResult["URL_TEMPLATES_USER_POST"],
+		"URL_TEMPLATES_PM_EDIT" => $arResult["URL_TEMPLATES_PM_EDIT"],
+		"URL_TEMPLATES_MESSAGE_SEND" => $arResult["URL_TEMPLATES_MESSAGE_SEND"],
+
+		"USER_FIELDS" => $arParams["USER_FIELDS"],
+		"MESSAGES_PER_PAGE" => $arParams["MESSAGES_PER_PAGE"],
+		"FID_RANGE" => $arParams["FID"],
+		"DATE_FORMAT" =>  $arParams["DATE_FORMAT"],
+		"NAME_TEMPLATE"	=> $arParams["NAME_TEMPLATE"],
+		"DATE_TIME_FORMAT" =>  $arParams["DATE_TIME_FORMAT"],
+		"PAGE_NAVIGATION_TEMPLATE" =>  $arParams["PAGE_NAVIGATION_TEMPLATE"],
+		"PATH_TO_SMILE" => $arParams["PATH_TO_SMILE"],
+		"PATH_TO_ICON" => $arParams["PATH_TO_ICON"],
+		"WORD_LENGTH" => $arParams["WORD_LENGTH"],
+		"IMAGE_SIZE" => $arParams["IMAGE_SIZE"],
+		"ATTACH_MODE" => $arParams["ATTACH_MODE"],
+		"ATTACH_SIZE" => $arParams["ATTACH_SIZE"],
+		"SET_NAVIGATION" => $arParams["SET_NAVIGATION"],
+		"SET_TITLE" => $arParams["SET_TITLE"],
+		"SEND_MAIL" => $arParams["SEND_MAIL"],
+		"SEND_ICQ" => $arParams["SEND_ICQ"],
+
+		"SEO_USER" => $arParams["SEO_USER"],
+
+		"CACHE_TIME" => $arParams["CACHE_TIME"],
+		"CACHE_TYPE" => $arParams["CACHE_TYPE"],
+	),
+	$component 
+);
+*/?>
+
+	<?
+		global $USER;
+		$arAutoriz ="";
 		if ($USER->IsAuthorized())
 		{
 			$arAutoriz = "Q" ;
 		}	
-		
-	if(!function_exists ('inclination'))
+	?>
+
+<?//**************Andrianov A.M. 31.07.2014******************************
+if(!function_exists ('inclination'))
 {
 		/*Функция склонения*/
 	function inclination($time, $arr=array("отзыв","отзыва","отзывов")) 
@@ -63,26 +93,15 @@ if(!function_exists ('EditData'))
 				$newData = $d." ".$MES[$arData[1]]." ".$arData[2]; 
 				return $newData;
 		}
-}	
-
-//**************END_Andrianov A.M. 16.07.2014******************************	
-    
-$URLimg = "/bitrix/components/avekom/user.photo/templates/.default/images/man.JPG";
-if ($arUser['PERSONAL_PHOTO']) {
-    $URLimg = CFile::GetPath($arUser['PERSONAL_PHOTO']);
-} else if ($arUser['PERSONAL_GENDER'] == "F") {
-    $URLimg = "/bitrix/components/avekom/user.photo/templates/.default/images/girl.JPG";
-}
-//if ($USER->IsAdmin()) {print_r($arUser);}
+}	//**************END_Andrianov A.M. 31.07.2014******************************		
 ?>
-<div id="content-surround">
-        <div class="content"><!--content-->
-        	<div class="container">
+	<?$idUSER = $arResult['UID']?>
 
-            	<div class="grid-8"><!-- rb -->
-                    <div class="block"><!-- block-->
-							<!----------Andrianov A.M. 31.07.2014----------------->
-										<h2>Мои сообщения на форуме</h2>
+	<div class="grid-8">
+		<div class="block">
+			
+			<!----------Andrianov A.M. 31.07.2014----------------->
+			<h2>Мои сообщения на форуме</h2>
 
 				
 				<div class="forum-block-posts">
@@ -203,59 +222,12 @@ if ($arUser['PERSONAL_PHOTO']) {
 					?>						
 	
 				</div>
-							<!----------END_Andrianov A.M. 31.07.2014----------------->
-							
-                    </div><!-- /block-->
-                </div><!-- /rb -->
-                    <div class="grid-4"><!--lb-->
-                        <div class="block">
-                            <h2>Личный кабинет</h2>
-                        <?
-                            $APPLICATION->IncludeComponent("bitrix:menu", "lich_kab_menu", array(
-                                "ROOT_MENU_TYPE" => "left",
-                                "MENU_CACHE_TYPE" => "N",
-                                "MENU_CACHE_TIME" => "3600",
-                                "MENU_CACHE_USE_GROUPS" => "Y",
-                                "MENU_CACHE_GET_VARS" => array(
-                                ),
-                                "MAX_LEVEL" => "1",
-                                "CHILD_MENU_TYPE" => "left",
-                                "USE_EXT" => "N",
-                                "DELAY" => "N",
-                                "ALLOW_MULTI_SELECT" => "N"
-                                    ), false
-                            );
-                            ?>
-                        </div>
-                    </div><!-- /lb -->
-                    <div class="clear"></div>
-            </div>
-        </div><!--/content-->
-        </div>
-<?
-?>
-     <div id="modalform" class="qa-form hide"> 
-            <div class="header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>Личное сообщение</h3>
-            </div>
-            <div class="form-text">
-                <form>
-                    <div class="qa-form-field-group">
-                        <div class="label">
-                            <label>Текст: </label>
-                        </div>
-                        <div class="field">
-                            <textarea></textarea>
-                        </div>
-                    </div>
-                    <div class="qa-form-buttons">
-                        <button data-dismiss="modal" class="btn gray float-right small-margin-left">Закрыть</button>
-                        <button class="btn green float-right">Отправить</button>
-                        <div class="clear"></div>
-                    </div>
-
-                </form>
-            </div>
-        </div> 
-  <?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+			
+			<!----------END_Andrianov A.M. 31.07.2014----------------->
+		</div><!--block-->
+	</div>	
+	<div class="grid-4">
+		<div class="block">
+			<h2>Личный кабинет<h2>
+		</div>
+	</div>
