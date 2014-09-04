@@ -6,6 +6,7 @@ define("IBLOCK_ID", 17);
 
 if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 {
+	
 		if (!$this->__component->__parent || empty($this->__component->__parent->__name)):
 			$GLOBALS['APPLICATION']->SetAdditionalCSS('/bitrix/components/bitrix/forum/templates/.default/style.css');
 			$GLOBALS['APPLICATION']->SetAdditionalCSS('/bitrix/components/bitrix/forum/templates/.default/themes/blue/style.css');
@@ -17,8 +18,8 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		********************************************************************/
 		if(!function_exists ('inclination'))
 		{
-				/*Р¤СѓРЅРєС†РёСЏ СЃРєР»РѕРЅРµРЅРёСЏ*/
-			function inclination($time, $arr=array("РѕС‚Р·С‹РІ","РѕС‚Р·С‹РІР°","РѕС‚Р·С‹РІРѕРІ")) 
+				/*Функция склонения*/
+			function inclination($time, $arr=array("отзыв","отзыва","отзывов")) 
 			{
 				$timex = substr($time, -1);
 				if ($time >= 10 && $time <= 20)
@@ -77,13 +78,13 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		?>
 
 		<?$this->SetViewTarget('title');?>
-		   <?$title=(empty($arResult["GROUP"]["NAME"]) ? "Р¤РѕСЂСѓРј РіРѕСЂРѕРґР° РЎРїСѓС‚РЅРёРє"  : $arResult["GROUP"]["NAME"])?>
+		   <?$title=(empty($arResult["GROUP"]["NAME"]) ? "Форум города Спутник"  : $arResult["GROUP"]["NAME"])?>
 		   <noindex><h2><?=$title?></h2></noindex>
 		<?$this->EndViewTarget();?> 
 
 		<div class="forum-block raised-corners">
 					<div class="forum-block-header">
-						<h3><?=empty($arResult["GROUP"]["NAME"]) ? "Р’Р°Р¶РЅРѕРµ" : "Razdel"/*$arResult["GROUP"]["NAME"]*/?></h3>
+						<h3><?=empty($arResult["GROUP"]["NAME"]) ? "Важное" : "Razdel"/*$arResult["GROUP"]["NAME"]*/?></h3>
 					</div>
 		<div class="forum-block-posts">				
 		<ul>
@@ -136,8 +137,8 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 											htmlspecialcharsEx(substr($res["~LAST_POSTER_NAME"], 0, $arParams["WORD_WRAP_CUT"]))."..." : $res["LAST_POSTER_NAME"]);
 									endif;
 					?>
-					
-					<li ondblclick="defaultico(this);">
+					<?$USER = new CUser;?>
+					<li <?if($USER->IsAdmin()):?>ondblclick="defaultico(this);"<?endif?>>
 								<div class="forum-icon">
 								<?
 									 if(CModule::IncludeModule("iblock"))
@@ -149,15 +150,15 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 									}
 								?>
 								<?if(empty($arField['XML_ID'])):?>	
-									<i id="<?=$res['ID']?>" class="fa fa-files-o" ondblclick="selectico(this, event);"></i>
+									<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 								
 								<?if($arField['PROPERTY_CODE'] === 'PROP_ICO'):?>
-									<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" ondblclick="selectico(this, event);"></i>
+									<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 								
 								<?if($arField['PROPERTY_CODE'] === 'PROP_IMG'):?>
-									<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" ondblclick="selectico(this, event);"></i>
+									<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 		<?
 						/*if ($res["NewMessage"] == "Y")
@@ -195,7 +196,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 												if($res['TOPICS'])
 												{
 												?>
-													<b>РџРѕРґСЂР°Р·РґРµР»С‹: </b>
+													<b>Подразделы: </b>
 												<?
 												}
 												while ($ar_res = $db_res->Fetch())
@@ -219,7 +220,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 							?>
 										<!--</p>-->
 										<p class="visible-800">
-											<strong><?=$res["TOPICS"]?> С‚РµРј, <?=$res["POSTS"]?> СЃРѕРѕР±С‰РµРЅРёР№</strong>
+											<strong><?=$res["TOPICS"]?> тем, <?=$res["POSTS"]?> сообщений</strong>
 										</p>
 			<?
 							if ($res["PERMISSION"] >= "Q" && ($res["MODERATE"]["TOPICS"] > 0 || $res["MODERATE"]["POSTS"] > 0)):
@@ -278,7 +279,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 
 
 		<?
-				}/*Р•СЃР»Рё РµСЃС‚СЊ С„РѕСЂСѓРјС‹*/
+				}/*Если есть форумы*/
 				
 				
 				$iCountRows = 0;
@@ -296,7 +297,27 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		?>			
 								<li>
 									<div class="forum-icon">
-										<i class="fa fa-files-o"></i>
+										<?
+											 if(CModule::IncludeModule("iblock"))
+											{ 
+												$ibpen = new CIBlockPropertyEnum;
+												$db_res = $ibpen->GetList(Array(), Array('IBLOCK_ID'=>IBLOCK_ID,
+																				'XML_ID'=>$res['ID']));
+												$arField = $db_res->Fetch();
+											}
+										?>
+										<?if(empty($arField['XML_ID'])):?>	
+											<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+										<?endif?>
+										
+										<?if($arField['PROPERTY_CODE'] === 'PROP_ICO'):?>
+											<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+										<?endif?>
+										
+										<?if($arField['PROPERTY_CODE'] === 'PROP_IMG'):?>
+											<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+										<?endif?>
+
 		<?
 						/*if ($res["NewMessage"] == "Y")
 						{
@@ -406,7 +427,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 										
 									
 										<p class="visible-800">
-											<strong><?=$res["TOPICS"]?> С‚РµРј, <?=$res["POSTS"]?> СЃРѕРѕР±С‰РµРЅРёР№</strong>
+											<strong><?=$res["TOPICS"]?> тем, <?=$res["POSTS"]?> сообщений</strong>
 										</p>
 									<?
 													if ($res["MODERATE"]["TOPICS"] > 0 || $res["MODERATE"]["POSTS"] > 0):
@@ -428,14 +449,14 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 									<div class="themes-count">
 											<b><?=$res["TOPICS"]?></b>
 											<br>
-											С‚РµРј<?$topic = inclination($res["TOPICS"], array('F_NOT_APPROVED_TOPICS_1', 'F_NOT_APPROVED_TOPICS_1_1',  'F_NOT_APPROVED_TOPICS_1_1_1')) ?>
+											тем<?$topic = inclination($res["TOPICS"], array('F_NOT_APPROVED_TOPICS_1', 'F_NOT_APPROVED_TOPICS_1_1',  'F_NOT_APPROVED_TOPICS_1_1_1')) ?>
 												<?/*=GetMessage($topic)*/?>
 										</div>
 										
 										<div class="post-count">
 											<b><?=$res["POSTS"]?></b>
 											<br>
-											РѕС‚РІРµС‚РѕРІ<?$answers = inclination($res["POSTS"], array('F_NOT_APPROVED_POSTS_2', 'F_NOT_APPROVED_POSTS_2_2',  'F_NOT_APPROVED_POSTS_2_2_2')) ?>
+											ответов<?$answers = inclination($res["POSTS"], array('F_NOT_APPROVED_POSTS_2', 'F_NOT_APPROVED_POSTS_2_2',  'F_NOT_APPROVED_POSTS_2_2_2')) ?>
 												<?/*=GetMessage($answers)*/?>
 										</div>
 									</div>
@@ -477,7 +498,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 						{
 							if(empty($arResult["GROUP"]["ID"])):
 								if ($GLOBALS['topLevel'] ):
-									/*РґР»СЏ РІРµСЂС…РЅРµРіРѕ СѓСЂРѕРІРЅСЏ (РЅР°Р·С‹РІР°РµС‚СЃСЏ Р’Р°Р¶РЅРѕ)*/
+									/*для верхнего уровня (называется Важно)*/
 											?>
 									
 									
@@ -494,7 +515,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 							
 							__PrintForumGroupsAndForums($arRes["GROUPS"][$key], $arResult, $arParams, $depth);
 							
-							/*Р”Р»СЏ РґСЂСѓРіРёС… СѓСЂРѕРІРЅРµР№*/
+							/*Для других уровней*/
 							if(empty($arResult["GROUP"]["ID"])):
 							?>
 							
@@ -510,7 +531,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 						}
 					}
 		?>
-				<?endif; /*РµСЃР»Рё РµСЃС‚СЊ РіСЂСѓРїРїС‹*/?>
+				<?endif; /*если есть группы*/?>
 
 
 				
@@ -537,7 +558,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 
 				<?if(!$title):?>
 										<?$this->SetViewTarget('title');?>
-									   <?$title=(empty($arResult["GROUP"]["NAME"]) ? "Р¤РѕСЂСѓРј РіРѕСЂРѕРґР° РЎРїСѓС‚РЅРёРє"  : $arResult["GROUP"]["NAME"])?>
+									   <?$title=(empty($arResult["GROUP"]["NAME"]) ? "Форум города Спутник"  : $arResult["GROUP"]["NAME"])?>
 									   <noindex><h2><?=$title?></h2></noindex>
 										<?$this->EndViewTarget();?> 
 									<?endif?>
@@ -590,7 +611,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		<div class='forum-pagination'>
 				<div class="dropdown-container">
 					<a class="dropdown-trigger" data-toggle="dropdown" href="#">
-						РЎС‚СЂР°РЅРёС†С‹
+						Страницы
 						<i></i>
 					</a>
 					<div class="cat-selector dropdown-menu">
@@ -606,15 +627,15 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		<script>
 			function selectico(el, event)
 			{
-				var FILE_SIZE = 30000; //Р±Р°Р№С‚С‹
-				/*РћС‚РјРµРЅСЏРµРј РІСЃРїР»С‹С‚РёРµ*/
-				event = event || window.event; // РљСЂРѕСЃСЃР±СЂР°СѓР·РµСЂРЅРѕ РїРѕР»СѓС‡РёС‚СЊ СЃРѕР±С‹С‚РёРµ
+				var FILE_SIZE = 30000; //байты
+				/*Отменяем всплытие*/
+				event = event || window.event; // Кроссбраузерно получить событие
 					
-				  if (event.stopPropagation) { // СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё РјРµС‚РѕРґ?
-					// РЎС‚Р°РЅРґР°СЂС‚РЅРѕ:
+				  if (event.stopPropagation) { // существует ли метод?
+					// Стандартно:
 					event.stopPropagation();
 				  } else {
-					// Р’Р°СЂРёР°РЅС‚ IE
+					// Вариант IE
 					event.cancelBubble = true;
 				  }
 
@@ -629,7 +650,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 					<input id="icotxt" type="text"/>\
 					<input id="icosave" type="button" value="OK"/>\
 					<input id="icofile" type="file" name="icofile"/>\
-					<input id="submit" type="button" value="РћС‚РїСЂР°РІРёС‚СЊ С„Р°Р№Р»"/>\
+					<input id="submit" type="button" value="Отправить файл"/>\
 					<input id="icocancel" type="button" value="cancel" \
 									onclick="icocancel();"/>\
 				</div>';
@@ -658,9 +679,9 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 				if($('#cancelico').length < 1)
 				{
 					var form = '<div id="cancelico">\
-											<label>РЎРґРµР»Р°С‚СЊ РёРєРѕРЅРєСѓ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ?</label>\
+											<label>Сделать иконку по умолчанию?</label>\
 											<input id="icodefok" type="button" value="OK"/>\
-											<input id="icodefcancel" type="button" value="cancel" \
+											<input id="icodefcancel" type="button" value="отмена" \
 															onclick="icodefcancel();"/>\
 										</div>';
 					$(el).append(form);
