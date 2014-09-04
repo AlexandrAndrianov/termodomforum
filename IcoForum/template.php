@@ -4,6 +4,10 @@ define("LIST_ID", 84);
 define("LIST_ID_IMG", 85);
 define("IBLOCK_ID", 17); 
 
+define("ADMIN_GROUP", 1);
+define("REGISTR_GROUP", 5);
+define("PANEL_GROUP", 6);
+		
 if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 {
 	
@@ -137,8 +141,10 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 											htmlspecialcharsEx(substr($res["~LAST_POSTER_NAME"], 0, $arParams["WORD_WRAP_CUT"]))."..." : $res["LAST_POSTER_NAME"]);
 									endif;
 					?>
-					<?$USER = new CUser;?>
-					<li <?if($USER->IsAdmin()):?>ondblclick="defaultico(this);"<?endif?>>
+					<?global $USER;
+						$arGrpUsr = $USER->GetUserGroupArray();
+					?>
+					<li <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="defaultico(this);"<?endif?>>
 								<div class="forum-icon">
 								<?
 									 if(CModule::IncludeModule("iblock"))
@@ -150,15 +156,15 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 									}
 								?>
 								<?if(empty($arField['XML_ID'])):?>	
-									<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+									<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 								
 								<?if($arField['PROPERTY_CODE'] === 'PROP_ICO'):?>
-									<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+									<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 								
 								<?if($arField['PROPERTY_CODE'] === 'PROP_IMG'):?>
-									<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+									<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 								<?endif?>
 		<?
 						/*if ($res["NewMessage"] == "Y")
@@ -307,15 +313,15 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 											}
 										?>
 										<?if(empty($arField['XML_ID'])):?>	
-											<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+											<i id="<?=$res['ID']?>" class="fa fa-files-o" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 										<?endif?>
 										
 										<?if($arField['PROPERTY_CODE'] === 'PROP_ICO'):?>
-											<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+											<i id="<?=$res['ID']?>" class="<?=empty($arField['XML_ID'])? 'fa fa-files-o' : $arField['VALUE']?>" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 										<?endif?>
 										
 										<?if($arField['PROPERTY_CODE'] === 'PROP_IMG'):?>
-											<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if($USER->IsAdmin()):?>ondblclick="selectico(this, event);"<?endif?>></i>
+											<img id="<?=$res['ID']?>" src="<?=$arField['VALUE']?>" <?if(in_array(ADMIN_GROUP, $arGrpUsr) || in_array(REGISTR_GROUP, $arGrpUsr) || in_array(PANEL_GROUP, $arGrpUsr)):?>ondblclick="selectico(this, event);"<?endif?>></i>
 										<?endif?>
 
 		<?
@@ -627,6 +633,10 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 		<script>
 			function selectico(el, event)
 			{
+				if($('#cancelico').length > 0)
+				{
+					$('#cancelico').remove();
+				}
 				var FILE_SIZE = 30000; //байты
 				/*Отменяем всплытие*/
 				event = event || window.event; // Кроссбраузерно получить событие
@@ -651,7 +661,7 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 					<input id="icosave" type="button" value="OK"/>\
 					<input id="icofile" type="file" name="icofile"/>\
 					<input id="submit" type="button" value="Отправить файл"/>\
-					<input id="icocancel" type="button" value="cancel" \
+					<input id="icocancel" type="button" value="отмена" \
 									onclick="icocancel();"/>\
 				</div>';
 				
@@ -676,6 +686,11 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 			
 			function defaultico(el)
 			{
+				if($('#blockico').length > 0)
+				{
+					$('#blockico').remove();
+				}
+				
 				if($('#cancelico').length < 1)
 				{
 					var form = '<div id="cancelico">\
@@ -799,8 +814,6 @@ if($_GET['key'] != 'icoselect' || $_POST['key'] != 'fileico')
 					);
 				}
 			?>
-			console.log('<?=$IDfile?>');
-			console.log('<?=$arpath['src']?>');
 			var img = '<img id="<?=$_POST['id']?>" src="<?=$path['src']?>"\
 								ondblclick="selectico(this, event);">';
 			$('#load').replaceWith(img);
